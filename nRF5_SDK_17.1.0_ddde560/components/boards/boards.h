@@ -81,6 +81,8 @@
   #include "d52_starterkit.h"
 #elif defined (BOARD_ARDUINO_PRIMO)
   #include "arduino_primo.h"
+#elif defined (BOARD_MICROBIT)
+    #include "microbit.h"
 #elif defined (CUSTOM_BOARD_INC)
   #include STRINGIFY(CUSTOM_BOARD_INC.h)
 #elif defined(BOARD_CUSTOM)
