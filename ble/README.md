@@ -51,3 +51,7 @@ mergehex -m hex/s113_nrf52_7.2.0_softdevice.hex _build/nrf52833_xxaa.hex -o MICR
 ```
 
 Copy MICROBIT.hex to board. If Successfull top row Leds should blink
+
+To test, download nRF Toolbox from Google store.
+
+Run UART service and select Nordic_UART device. It opens up a message  window where you can type messages that will show up in UART terminal  window and vise-versa.
