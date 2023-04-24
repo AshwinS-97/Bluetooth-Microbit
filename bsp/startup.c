@@ -3,13 +3,15 @@
 //*****************************************************************************
 // Functions defined in this file
 //*****************************************************************************
-void ResetISR(void);
+void Reset_Handler(void);
 static void crt_init(void);
 static void HardFaultHandler(void);
 static void BusFaultHandler(void);
 static void UsageFaultHandler(void);
 void SysTickHandler(void);
 void GPIOTE_IRQHandler(void);
+void RTC1_IRQHandler(void);
+void SWI2_EGU2_IRQHandler(void);
 static void IntDefaultHandler(void);
 
 //*****************************************************************************
@@ -17,7 +19,7 @@ static void IntDefaultHandler(void);
 // the "data" and "bss" segments reside in memory.  The initializers for the
 // for the "data" segment resides immediately following the "text" segment.
 //*****************************************************************************
-extern uint32_t __data_load__;  // load address of initialized data in ROM
+extern uint32_t __etext;        // load address of initialized data in ROM
 extern uint32_t __data_start__; // start address of initialized data in RAM
 extern uint32_t __data_end__;   // end address of initialized data in RAM
 extern uint32_t __bss_start__;  // start address of uninitialized data in RAM
@@ -30,14 +32,21 @@ extern int main(void);          // application main function
 typedef void (*pfn_t)(void);
 
 //*****************************************************************************
+// Stack
+//*****************************************************************************
+#define STACK_SIZE  (8192/4)    // stack size in long words
+__attribute__ ((section(".stack")))
+uint32_t stack[STACK_SIZE];
+
+//*****************************************************************************
 // Vector table
 //*****************************************************************************
-__attribute__ ((section(".vectors")))
+__attribute__ ((section(".isr_vector")))
 pfn_t vector_table[] =
 {
     /* Core exceptions */
-    (pfn_t) (long) (&__stack_end__),        // The initial stack pointer
-    ResetISR,                               // The reset handler
+    (pfn_t) (long) (stack + STACK_SIZE),    // The initial stack pointer
+    Reset_Handler,                          // The reset handler
     IntDefaultHandler,                      // The NMI handler
     HardFaultHandler,                       // The hard fault handler
     IntDefaultHandler,                      // The MPU fault handler
@@ -70,12 +79,12 @@ pfn_t vector_table[] =
     IntDefaultHandler,                      // ECB_IRQHandler
     IntDefaultHandler,                      // CCM_AAR_IRQHandler
     IntDefaultHandler,                      // WDT_IRQHandler
-    IntDefaultHandler,                      // RTC1_IRQHandler
+    RTC1_IRQHandler,
     IntDefaultHandler,                      // QDEC_IRQHandler
     IntDefaultHandler,                      // COMP_LPCOMP_IRQHandler
     IntDefaultHandler,                      // SWI0_EGU0_IRQHandler
     IntDefaultHandler,                      // SWI1_EGU1_IRQHandler
-    IntDefaultHandler,                      // SWI2_EGU2_IRQHandler
+    SWI2_EGU2_IRQHandler,
     IntDefaultHandler,                      // SWI3_EGU3_IRQHandler
     IntDefaultHandler,                      // SWI4_EGU4_IRQHandler
     IntDefaultHandler,                      // SWI5_EGU5_IRQHandler
@@ -167,7 +176,7 @@ pfn_t vector_table[] =
     0                                       // Reserved
 };
 
-void ResetISR(void)
+void Reset_Handler(void)
 {
     crt_init();
     SystemInit();
@@ -183,9 +192,9 @@ static void crt_init(void)
     uint32_t *pui32Src, *pui32Dest;
 
     // Copy the data segment initializers from flash to SRAM.
-    pui32Src = &__data_load__;
+    pui32Src = &__etext;
     pui32Dest = &__data_start__;
-    while(pui32Dest < &__data_end__)
+    while(pui32Dest < &__bss_start__)
         *pui32Dest++ = *pui32Src++;
 
     // Zero fill the bss segment.
@@ -204,4 +213,6 @@ static void BusFaultHandler(void) { led_blink(4, 1, BLINK_FOREVER); }
 static void UsageFaultHandler(void) { led_blink(4, 2, BLINK_FOREVER); }
 void __attribute__((weak)) SysTickHandler(void) { IntDefaultHandler(); }
 void __attribute__((weak)) GPIOTE_IRQHandler(void) { IntDefaultHandler(); }
+void __attribute__((weak)) SWI2_EGU2_IRQHandler(void) { IntDefaultHandler(); }
+void __attribute__((weak)) RTC1_IRQHandler(void) { IntDefaultHandler(); }
 static void IntDefaultHandler(void) { led_blink(4, 4, BLINK_FOREVER); }

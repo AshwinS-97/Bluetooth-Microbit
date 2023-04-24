@@ -108,55 +108,5 @@ uint32_t gpio_read(uint32_t pin)
 
 /* Interrupt related configuration */
 
-/* GPIOTE registers */
-#define GPIOTE_EVENTSIN(i)  IOREG32(0x40006100 + 4*(i))
-#define GPIOTE_INTENSET     IOREG32(0x40006304)
-#define GPIOTE_CONFIG(i)    IOREG32(0x40006510 + 4*(i))
-#define     GPIOTE_MODEEVENT    (1)
+// All Interupt related configuration removed as its being used in Bluetooth Softdevice
 
-/* NVIC registers */
-#define NVIC_ISER           IOREG32(0xE000E100)
-#define GPIOTE_ID           6               // peripheral ID
-
-typedef void (*pfn_t)(void);
-pfn_t event_callbacks[8];
-
-void gpio_inten(uint32_t pin, uint32_t event_no, uint32_t edge, pfn_t callback)
-{
-   /* function to call back when the event occurs */
-   event_callbacks[event_no] = callback;
-
-    /* GPIOTE has 8 registers, each can be configured for event i (i = 0 to 7) 
-     * along with the pin number and event type associated with the event.
-     */
-   GPIOTE_CONFIG(event_no)
-        = ((GPIOTE_MODEEVENT) | (pin << 8) | (edge << 16));
-
-   /* Generate an interrupt when the specified event occurs. */
-   GPIOTE_INTENSET |= (1 << event_no);
-
-    /* Enable GPIOTE interrupts in the interrupt controller */
-    NVIC_ISER |= (1 << GPIOTE_ID);
-}
-
-/* use these for debugging */
-volatile int gpio_irq_counter;
-volatile int gpio_irq_event_counters[8];
-
-void GPIOTE_IRQHandler(void)
-{
-    int i;
-
-    for (i = 0; i < 8; i++)
-    {
-        if (GPIOTE_EVENTSIN(i))
-        {
-            gpio_irq_event_counters[i]++;
-            if (event_callbacks[i])
-                event_callbacks[i]();
-            GPIOTE_EVENTSIN(i) = 0;
-        }
-    }
-
-    gpio_irq_counter++;
-}

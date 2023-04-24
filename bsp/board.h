@@ -13,7 +13,7 @@ extern "C" {
 #include "pwm.h"
 #include "adc.h"
 #include "audio.h"
-#include "timer.h"
+//#include "timer.h"
 
 /* LEDs definitions for 5x5 matrix display */
 #define LED_NUM_ROWS    5
