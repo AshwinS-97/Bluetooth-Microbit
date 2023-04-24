@@ -2,8 +2,8 @@ PROJECT_NAME     := ble_app_uart_pca10100_s113
 TARGETS          := nrf52833_xxaa
 OUTPUT_DIRECTORY := _build
 
-SDK_ROOT := ../../../../../..
-PROJ_DIR := ../../..
+SDK_ROOT := ../nRF5_SDK_17.1.0_ddde560
+PROJ_DIR := .
 
 $(OUTPUT_DIRECTORY)/nrf52833_xxaa.out: \
   LINKER_SCRIPT  := ble_app_uart_gcc_nrf52.ld
@@ -142,7 +142,7 @@ INC_FOLDERS += \
   $(SDK_ROOT)/components/nfc/t4t_parser/apdu \
   $(SDK_ROOT)/components/libraries/util \
   $(SDK_ROOT)/components/softdevice/s113/headers/nrf52 \
-  ../config \
+  $(PROJ_DIR) \
   $(SDK_ROOT)/components/libraries/usbd/class/cdc \
   $(SDK_ROOT)/components/libraries/csense \
   $(SDK_ROOT)/components/libraries/balloc \
@@ -218,7 +218,7 @@ OPT = -O3 -g3
 CFLAGS += $(OPT)
 CFLAGS += -DAPP_TIMER_V2
 CFLAGS += -DAPP_TIMER_V2_RTC1_ENABLED
-CFLAGS += -DBOARD_PCA10100
+CFLAGS += -DBOARD_MICROBIT
 CFLAGS += -DCONFIG_GPIO_AS_PINRESET
 CFLAGS += -DFLOAT_ABI_HARD
 CFLAGS += -DNRF52833_XXAA
@@ -228,6 +228,7 @@ CFLAGS += -DSOFTDEVICE_PRESENT
 CFLAGS += -mcpu=cortex-m4
 CFLAGS += -mthumb -mabi=aapcs
 CFLAGS += -Wall -Werror
+CFLAGS += -Wno-array-bounds
 CFLAGS += -mfloat-abi=hard -mfpu=fpv4-sp-d16
 # keep every function in a separate section, this allows linker to discard unused ones
 CFLAGS += -ffunction-sections -fdata-sections -fno-strict-aliasing
@@ -242,7 +243,7 @@ ASMFLAGS += -mthumb -mabi=aapcs
 ASMFLAGS += -mfloat-abi=hard -mfpu=fpv4-sp-d16
 ASMFLAGS += -DAPP_TIMER_V2
 ASMFLAGS += -DAPP_TIMER_V2_RTC1_ENABLED
-ASMFLAGS += -DBOARD_PCA10100
+ASMFLAGS += -DBOARD_MICROBIT
 ASMFLAGS += -DCONFIG_GPIO_AS_PINRESET
 ASMFLAGS += -DFLOAT_ABI_HARD
 ASMFLAGS += -DNRF52833_XXAA
