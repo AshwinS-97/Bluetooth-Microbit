@@ -14,14 +14,10 @@ static void ble_recv_handler(const uint8_t data[], uint32_t len)
 
 int main(void)
 {
-    /* BSP initializations before BLE because we are using printf from BSP */
-    board_init();
     ble_init(ble_recv_handler);
 
-    /* Greetings */
-    printf("hello, world!\n");
-    audio_sweep(500, 2000, 100);
-
-    while (1)
+    while(1)
         ;
+
+    return 0;
 }
