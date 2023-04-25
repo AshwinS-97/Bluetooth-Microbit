@@ -8,6 +8,9 @@ static void crt_init(void);
 static void HardFaultHandler(void);
 static void BusFaultHandler(void);
 static void UsageFaultHandler(void);
+void SVC_Handler(void);
+void PendSV_Handler(void);
+void SysTick_Handler(void);
 void SysTickHandler(void);
 void GPIOTE_IRQHandler(void);
 void RTC1_IRQHandler(void);
@@ -56,11 +59,11 @@ pfn_t vector_table[] =
     0,                                      // Reserved
     0,                                      // Reserved
     0,                                      // Reserved
-    IntDefaultHandler,                      // SVCall handler
+    SVC_Handler,                            // SVCall handler
     IntDefaultHandler,                      // Debug monitor handler
     0,                                      // Reserved
-    IntDefaultHandler,                      // The PendSV handler
-    SysTickHandler,                         // The SysTick handler
+    PendSV_Handler,                         // The PendSV handler
+    SysTick_Handler,                        // The SysTick handler
     /* Peripheral interrupts */
     IntDefaultHandler,                      // POWER_CLOCK_IRQHandler
     IntDefaultHandler,                      // RADIO_IRQHandler
@@ -211,7 +214,9 @@ extern void led_blink(int r, int c, int count);
 static void HardFaultHandler(void) { led_blink(4, 0, BLINK_FOREVER); }
 static void BusFaultHandler(void) { led_blink(4, 1, BLINK_FOREVER); }
 static void UsageFaultHandler(void) { led_blink(4, 2, BLINK_FOREVER); }
-void __attribute__((weak)) SysTickHandler(void) { IntDefaultHandler(); }
+void __attribute__((weak)) SVC_Handler(void) { IntDefaultHandler(); }
+void __attribute__((weak)) PendSV_Handler(void) { IntDefaultHandler(); }
+void __attribute__((weak)) SysTick_Handler(void) { IntDefaultHandler(); }
 void __attribute__((weak)) GPIOTE_IRQHandler(void) { IntDefaultHandler(); }
 void __attribute__((weak)) SWI2_EGU2_IRQHandler(void) { IntDefaultHandler(); }
 void __attribute__((weak)) RTC1_IRQHandler(void) { IntDefaultHandler(); }

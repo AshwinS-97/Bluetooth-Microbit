@@ -170,7 +170,7 @@ __STATIC_INLINE void SVC_Setup (void) {
   if (p >= n) {
     n = p + 1U;
   }
-  SCB->SHP[7] = (uint8_t)(0xFEU << n);
+  SCB->SHP[7] = (uint8_t)(0xFCU << n);
 #elif  (defined(__ARM_ARCH_6M__)        && (__ARM_ARCH_6M__        != 0))
   uint32_t n;
 

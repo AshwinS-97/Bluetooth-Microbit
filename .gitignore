@@ -1,3 +1,8 @@
 tool
 ble/_build
 ble/MICROBIT.hex
+*.hex
+*.out
+rtx/*.a
+bsp/*.a
+ble/*.a
