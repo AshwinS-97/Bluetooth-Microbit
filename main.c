@@ -5,9 +5,11 @@
 #include "ble_uart.h"
 #include "board.h"
 #include "lib.h"
+#include "buggy_controller.h"
 
 /* OS objects */
 osThreadId_t tid_ctrl;
+osThreadId_t tid_disp;
 
 /* Buffer to hold the command received from UART or BLE
  * We use single buffer assuming command-response protocol,
@@ -16,6 +18,16 @@ osThreadId_t tid_ctrl;
  */
 uint8_t cmd_buf[256];
 uint32_t cmd_len;
+
+uint8_t pic[5][5] ={        {0, 0, 0, 0, 0},
+                            {0, 0, 0, 0, 0},
+                            {0, 0, 0, 0, 0},
+                            {0, 0, 0, 0, 0},
+                            {0, 0, 0, 0, 0} 
+                    };	
+
+
+
 
 /* Called from BLE softdevice using SWI2_EGU2_IRQHandler */
 static void ble_recv_handler(const uint8_t s[], uint32_t len)
@@ -44,16 +56,35 @@ void task_ctrl(void *arg)
         puts((char *) cmd_buf);
         puts("\n");
 
+        
+        add_controllerMsg((char *) cmd_buf);
+      
+
         /* Echo on BLE */
         ble_send((uint8_t *) cmd_buf, strlen((char *) cmd_buf));
     }
 }
+
+// Display Task
+
+void task_disp(void *arg)
+{
+    while (1)
+    {
+        
+        led_display(pic); 
+        check_controllerMsg();   
+           
+    }
+}
+// Display Task
 
 int main(void)
 {
     /* BSP initializations before BLE because we are using printf from BSP */
     board_init();
     ble_init(ble_recv_handler);
+    
 
     /* Greetings */
     printf("hello, world!\n");
@@ -61,10 +92,15 @@ int main(void)
 
     /* Initialize and start the kernel */
     osKernelInitialize();
+    init_controller();
 
     /* controller task */
     tid_ctrl = osThreadNew(task_ctrl, NULL, NULL);
-    osThreadSetPriority(tid_ctrl, osPriorityLow);
+    osThreadSetPriority(tid_ctrl, osPriorityLow1);
+
+    /* Display Task */
+    tid_disp = osThreadNew(task_disp, NULL, NULL);
+    osThreadSetPriority(tid_disp, osPriorityLow);
 
     osKernelStart();
     /* never returns */

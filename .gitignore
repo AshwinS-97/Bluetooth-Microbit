@@ -6,3 +6,5 @@ ble/MICROBIT.hex
 rtx/*.a
 bsp/*.a
 ble/*.a
+*.hex
+*.map

@@ -20,6 +20,9 @@ CFLAGS="-I$BSPDIR -I$BLEDIR -I$RTXDIR -O3 -g3 -Wall -Werror $ARCH $OPT"
 echo Compiling main.c
 arm-none-eabi-gcc -c $CFLAGS main.c
 
+
+
+
 # Link the object code to form exectuable program
 echo Linking MICROBIT.out
 arm-none-eabi-ld -T ble_uart.ld -Map system.map \
@@ -37,6 +40,8 @@ arm-none-eabi-size app.out
 # Generate HEX file to load on the target
 arm-none-eabi-objcopy -O ihex app.out app.hex
 mergehex -m $BLEDIR/hex/s113_nrf52_7.2.0_softdevice.hex app.hex -o MICROBIT.hex
+
+rm main.o app.out app.hex
 
 # Upload on the target
 cmd.exe /c copy MICROBIT.hex E:

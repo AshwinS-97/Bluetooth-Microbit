@@ -7,4 +7,4 @@
 
 [RTX Setup](rtx/README.md)
 
-[BSP Setup](bsp/README.txt)
+[BSP Setup](bsp/README.md)
