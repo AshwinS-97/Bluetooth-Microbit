@@ -1,15 +1,16 @@
 #include <stdint.h>
 #include <string.h>
-
 #include "cmsis_os2.h"
 #include "ble_uart.h"
 #include "board.h"
 #include "lib.h"
 #include "buggy_controller.h"
+#include "utility.h"
 
 /* OS objects */
 osThreadId_t tid_ctrl;
 osThreadId_t tid_disp;
+
 
 /* Buffer to hold the command received from UART or BLE
  * We use single buffer assuming command-response protocol,
@@ -53,10 +54,10 @@ void task_ctrl(void *arg)
         osThreadFlagsWait(1, osFlagsWaitAny, osWaitForever);
 
         /* Echo on UART */
-        puts((char *) cmd_buf);
-        puts("\n");
+        puts1((char *) cmd_buf);
+        puts1("\n");
 
-        
+        ftoa(12.7777, (char *)cmd_buf, 4);
         add_controllerMsg((char *) cmd_buf);
       
 
@@ -87,7 +88,7 @@ int main(void)
     
 
     /* Greetings */
-    printf("hello, world!\n");
+    //printf("hello, world!\n");
     audio_sweep(500, 2000, 100);
 
     /* Initialize and start the kernel */

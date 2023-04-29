@@ -42,10 +42,10 @@ typedef struct{
 }ControllerMsg;
 
 int init_controller(void){
-  puts("init controller\n\r");
+  puts1("init controller\n\r");
      controller_MsgQueue = osMessageQueueNew(MSGQUEUE_LENGTH, sizeof(ControllerMsg), NULL);
   if (controller_MsgQueue == NULL) {
-    puts("Message Queue object not created, handle failure\n\r");
+    puts1("Message Queue object not created, handle failure\n\r");
   }
 
   return 0;
@@ -57,15 +57,15 @@ void check_controllerMsg(void){
     osStatus_t status;
     uint16_t msgCount = osMessageQueueGetCount(controller_MsgQueue);
 
-    //puts("in check_controllerMsg\n\r");
+    //puts1("in check_controllerMsg\n\r");
     for(int i =0 ; i<msgCount; i++){
       status = osMessageQueueGet(controller_MsgQueue, &msg, NULL, 0U); 
-      puts("Debud :: inside for");
+      puts1("Debud :: inside for");
       if (status == osOK) {
         char* command = msg.command;
-        puts("command : ");
-        puts(command);
-        puts("\n\r");
+        puts1("command : ");
+        puts1(command);
+        puts1("\n\r");
         execute_driver(command);
         
       }
@@ -75,11 +75,11 @@ void check_controllerMsg(void){
 void add_controllerMsg(char* command){
   ControllerMsg msg;
   msg.command = command;
-  puts("in add_controllerMsg\n\r");
+  puts1("in add_controllerMsg\n\r");
   osMessageQueuePut(controller_MsgQueue, &msg, 0U, 0U);
-  puts("added the message in the queue with command :");
-  puts(command);
-  puts("\n\r");
+  puts1("added the message in the queue with command :");
+  puts1(command);
+  puts1("\n\r");
   
 }
 
@@ -87,22 +87,22 @@ void execute_driver(char* command){
   if(strcmp(command,"FORWARD")==0){
     //buggy_move_forward(100);
     led_display(fwd);
-    puts("MOVING FORWARD");
+    puts1("MOVING FORWARD");
   }else if(strcmp(command,"BACKWARD")==0){
     //buggy_move_reverse(100);
-    puts("MOVING BACKWARD");
+    puts1("MOVING BACKWARD");
     led_display(rev);
   }else if(strcmp(command,"LEFT")==0){
     //buggy_spin_left();
-    puts("MOVING LEFT");
+    puts1("MOVING LEFT");
     led_display(left);
   }else if(strcmp(command,"RIGHT")==0){
     //buggy_spin_right();
-    puts("MOVING RIGHT");
+    puts1("MOVING RIGHT");
     led_display(right);
   }else if(strcmp(command,"STOP")==0){
     //buggy_stop();
-    puts("STOPPING");
+    puts1("STOPPING");
   }
           
 }

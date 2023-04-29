@@ -191,7 +191,7 @@ static void f_bufferc(void *q, char c) {
 }
 
 /* printf -- print using client-supplied print_buf */
-void printf(const char *fmt, ...) {
+void printf1(const char *fmt, ...) {
     va_list va;
     struct buffer b;
     b.nbuf = 0;

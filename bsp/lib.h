@@ -11,7 +11,7 @@
 void do_print(void (*putch)(char), const char *fmt, va_list va);
 
 /* printf -- print using putchar */
-void printf(const char *fmt, ...);
+void printf1(const char *fmt, ...);
 
 /* sprintf -- print to string buffer.  Note danger of overflow! */
 int sprintf(char *buf, const char *fmt, ...);

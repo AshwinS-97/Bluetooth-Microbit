@@ -41,11 +41,17 @@ echo Compiling audio.c
 $CC -c $CFLAGS audio.c
 echo Compiling buggy_controller.c
 $CC -c $CFLAGS buggy_controller.c
+echo Compiling i2c.c
+$CC -c $CFLAGS i2c.c
+echo Compiling lsm303agr.c
+$CC -c $CFLAGS lsm303agr.c
+echo Compiling utility.c
+$CC -c $CFLAGS utility.c
 
 # Link the object code to form exectuable program
 echo Generating libbsp.a
 /bin/rm -f libbsp.a
 $AR -r libbsp.a startup.o system.o board.o \
-        serial.o gpio.o pwm.o adc.o lib.o audio.o buggy_controller.o
-/bin/rm -f system.o board.o \
-        serial.o gpio.o pwm.o adc.o lib.o audio.o buggy_controller.o
+        serial.o gpio.o pwm.o adc.o lib.o audio.o buggy_controller.o lsm303agr.o i2c.o utility.o
+/bin/rm -f system.o board.o utility.o\
+        serial.o gpio.o pwm.o adc.o lib.o audio.o buggy_controller.o lsm303agr.o i2c.o

@@ -2,6 +2,7 @@
 #include "gpio.h"
 #include "serial.h"
 
+
 #ifndef IOREG32
 #define IOREG32(addr) (*(volatile unsigned long *) (addr))
 #endif
@@ -87,7 +88,7 @@ char getc_nowait(void)
     return UART_RXD;
 }
 
-char getc(void)
+char getc1(void)
 {
     char ch;
 
@@ -107,7 +108,7 @@ void putc_nowait(char ch)
     UART_TXD = ch;
 }
 
-void putc(char ch)
+void putc1(char ch)
 {
     /* Write into data buffer and wait till tx complete */
     UART_TXD = ch;
@@ -120,12 +121,12 @@ void putc(char ch)
     return;
 }
 
-void puts(char s[])
+void puts1(char s[])
 {
     char *p;
 
     for (p = s; *p; p++)
-        putc(*p);
+        putc1(*p);
 }
 
 /* printf_buf -- integrating Spivey's library code */
@@ -134,5 +135,5 @@ void print_buf(char *buf, int n)
     int i;
 
     for (i = 0; i < n; i++)
-        putc(buf[i]);
+        putc1(buf[i]);
 }
