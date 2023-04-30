@@ -58,3 +58,17 @@ void ftoa(float n, char* res, int afterpoint)
         intToStr((int)fpart, res + i + 1, afterpoint);
     }
 }
+
+float dot(const float* v, const float* w, uint8_t size){
+    float res = 0;
+    for (int i = 0; i < size; i++){
+        res += v[i]*w[i];
+    }
+    return res;
+}
+
+float norm (const float* v, uint8_t size){
+    double res =  (double) (dot(v,v, size));
+    //res = sqrt(res);
+    return res;
+}
