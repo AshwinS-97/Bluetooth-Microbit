@@ -1,5 +1,8 @@
 #include "utility.h"
+#include "../rtx/cmsis_os2.h"
 #include <string.h>
+#include <math.h>
+
 
 void reverse(char* str, int len)
 {
@@ -19,6 +22,9 @@ void reverse(char* str, int len)
 // then 0s are added at the beginning.
 int intToStr(int x, char str[], int d)
 {
+    if(x<0){
+        x*=-1;
+    }
     int i = 0;
     while (x) {
         str[i++] = (x % 10) + '0';
@@ -39,8 +45,15 @@ int intToStr(int x, char str[], int d)
 void ftoa(float n, char* res, int afterpoint)
 {
     // Extract integer part
+    //int flag =0;
+    //float num = n;
+    if(n<0){
+        //flag =1;
+        n*=-1;
+    }
     int ipart = (int)n;
  
+    
     // Extract floating part
     float fpart = n - (float)ipart;
  
@@ -58,11 +71,40 @@ void ftoa(float n, char* res, int afterpoint)
  
         intToStr((int)fpart, res + i + 1, afterpoint);
     }
+    
+
+}
+
+void float_to_string(float num, int precision, char buff[]){
+    int flag = 0;
+    if(num<0){
+        flag= 1;
+    }
+    
+    int ipart = (int)num;
+    int fpart = (num - ipart)*pow(10,precision);
+    
+    char ipartArr[4];
+    char fpartArr[4];
+    
+    intToStr(ipart,ipartArr,3);
+    intToStr(fpart,fpartArr,3);
+    
+    buff="";
+    if(flag){
+        strcpy(buff,"-");
+    }
+    
+    strcat(buff,ipartArr);
+    strcat(buff,".");
+    strcat(buff,fpartArr);
+    
+    
 }
 
 void printMetrics(float refAngle,float currAngle, int error, float kp,int lcontrol,int rcontrol,char* msg){
     
-    
+    strcpy(msg,"");
     char refAngleArr[7];
     ftoa(refAngle,refAngleArr,3);
 
@@ -93,7 +135,7 @@ void printMetrics(float refAngle,float currAngle, int error, float kp,int lcontr
     strcat(msg,lcontrolArr);
     strcat(msg," , ");
     strcat(msg,rcontrolArr);
-    strcat(msg,"] \n");
-
+    strcat(msg,"]");
+   
 
 }

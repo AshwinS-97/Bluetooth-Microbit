@@ -9,7 +9,8 @@
 #include "motion.h"
 
 #define MSGQUEUE_LENGTH 10
-char* msg ="[refHeading,currHeading,error,ctrlSignal,lctrlSignal,rctrlSignal]\n";
+//char* msg ="[refHeading,currHeading,error,ctrlSignal,lctrlSignal,rctrlSignal]";
+char msg[100];
 
 extern float referenceHeading;
 extern float currentHeading;
@@ -158,6 +159,11 @@ void execute_driver(char *command)
     puts1("LOGGING\n\r");
     tid_log = osThreadNew(task_log, NULL, NULL);
     osThreadSetPriority(task_log, osPriorityLow);
+    // char buff[10];
+    // ftoa(-656.73,buff,3);
+    // puts1("test = ");
+    // puts1(buff);
+    // puts1("\n\r");
   }
   else if (strcasecmp(command, "STOP LOG") == 0)
   {
@@ -172,12 +178,14 @@ void task_log(void *args)
   ble_send((uint8_t *)msg, strlen((char *)msg));
   while (1)
   {
-    char* msg="";
+   
     printMetrics(referenceHeading, currentHeading, error, controlSignal,lControlSignal,rControlSignal, msg);
     puts1("msg = ");
     puts1(msg);
+    puts1("\n\r");
     ble_send((uint8_t *)msg, strlen((char *)msg));
     osDelay(1000);
+    
   }
 }
 

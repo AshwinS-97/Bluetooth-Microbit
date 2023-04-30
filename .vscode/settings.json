@@ -4,5 +4,6 @@
         "board.h": "c",
         "pwm.h": "c",
         "lsm303agr.h": "c"
-    }
+    },
+    "cmake.sourceDirectory": "/home/navin/Documents/RTES/Bluetooth-Microbit-v2/nRF5_SDK_17.1.0_ddde560/external/mbedtls"
 }
