@@ -7,11 +7,13 @@
 #include "utility.h"
 #include "i2c.h"
 #include "lsm303agr.h"
+#include "adc.h"
 
 /* OS objects */
 osThreadId_t tid_ctrl;
 osThreadId_t tid_disp;
 osThreadId_t timer_id;
+osThreadId_t clap_id;
 
 
 
@@ -55,6 +57,11 @@ void timer_callback(void *arg)
         // if (counter == 1 ) puts1(" Printin\r\n") ;
         if (norm (acc_val_filtered, 3) > UPPER_THRESHOLD || norm (acc_val_filtered, 3) < LOWER_THRESHOLD)
         puts1("Collision detected\r\n");
+        // Clap detection
+        if(ADC_EVENTS_END == 1)
+        {
+            osThreadFlagsSet(clap_id, 1);
+        }
         osDelay(1);
     }
 }
@@ -108,7 +115,18 @@ void task_disp(void *arg)
            
      }
 }
-// Display Task
+// clap 
+void clap_detection(void *arg)
+{
+    while(1){
+        if(clap_detect()){
+            puts1("clap Detected\r\n");
+        }
+        else{
+
+        }
+    }
+}
 
 int main(void)
 {
@@ -133,11 +151,15 @@ int main(void)
 
     /* controller task */
     tid_ctrl = osThreadNew(task_ctrl, NULL, NULL);
-    osThreadSetPriority(tid_ctrl, osPriorityLow1);
+    osThreadSetPriority(tid_ctrl, osPriorityLow2);
 
     /* Display Task */
     tid_disp = osThreadNew(task_disp, NULL, NULL);
     osThreadSetPriority(tid_disp, osPriorityLow);
+
+    /* Display Task */
+    clap_id = osThreadNew(clap_detection, NULL, NULL);
+    osThreadSetPriority(clap_id, osPriorityLow1);
 
     /* Timer Thread */
     timer_id = osThreadNew (timer_callback, NULL, NULL);

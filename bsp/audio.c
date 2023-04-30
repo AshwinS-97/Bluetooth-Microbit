@@ -6,8 +6,13 @@
 #include "pwm.h"
 #include "adc.h"
 #include "lib.h"
+#include "utility.h"
+#include "serial.h"
+
+char sample_buff[256];
 
 void delay_ms(uint32_t ms);
+
 
 /* Initialize speaker and mic */
 void audio_init(uint32_t speaker_pin, uint32_t mic_pin, uint32_t run_mic_pin)
@@ -15,6 +20,7 @@ void audio_init(uint32_t speaker_pin, uint32_t mic_pin, uint32_t run_mic_pin)
     /* Speaker is connected to a PWM pin. We can use it to play tones by
      * generating a square wave at a specific frequency.
      */
+    //board_init();
     pwm_init(speaker_pin);
 
     if (run_mic_pin != 0)    // should we turn on the mic?
@@ -174,27 +180,35 @@ void music_play(char tunes[])
 #define CLAP_WINDOW 20  // 20 ms window to collect samples
 #define CLAP_FRAMELEN   ((CLAP_WINDOW * MIC_SAMPLE_RATE) / 1000)
 
-#define CLAP_THRESHOLD  0x100000    // by trial and error
+#define CLAP_THRESHOLD  0x800000    // by trial and error
 
 static uint16_t samples[CLAP_FRAMELEN];     // to collect the samples
 
 uint32_t clap_detect(void)
 {
+    
     uint32_t dc;    // ADC provides unsigned samples with DC somewhere
                     //  around the middle. We need to compute the DC value
                     //  and subtract before computing the energy.
     uint32_t energy;
-
+    //char eng_buff[256];
     // Previous two decisions and the current decision to decide if
     // there was a clap or not.
-    static uint32_t prev[2];    // previous two energy decisions
+    static uint32_t prev[2];    // previous three energy decisions
     uint32_t current;           // current energy decisions
     uint32_t clap;              // clap decision
+    //clap = 0;
     int i;
 
     /* Read a buffer of samples from the mic */
     adc_read(samples, CLAP_FRAMELEN);
-
+    // for (int i =0; i<CLAP_FRAMELEN;i++)
+    // {
+    //     intToStr(samples[i],sample_buff,3);
+    //     puts1(sample_buff);
+    //     puts1("\n");
+    // }
+    // while(1);
     /* printf("%x\n", adc_in()); */
 
     /* Compute DC */
@@ -213,8 +227,14 @@ uint32_t clap_detect(void)
 
         energy += s * s;
     }
-    /* printf("energy = %x\n", (unsigned int) energy); */
-
+    // puts1("energy = ");
+    // intToStr(energy,eng_buff,10);
+    // puts1(eng_buff);
+    // delay_ms(10);
+    // puts1("\n");
+    // puts1("Medium = ");
+    // intToStr(dc,eng_buff,10);
+    // puts1(eng_buff);
     /* Current threshold detection */
     if (energy > CLAP_THRESHOLD)
         current = 1;
@@ -222,11 +242,21 @@ uint32_t clap_detect(void)
         current = 0;
 
     /* It's a clap if prev1-prev0-current decisions are 0-1-0 */
-    clap = ((prev[1] == 0) && (prev[0] == 1) && (current == 0));
+    clap = ((prev[1] == 1) && (prev[0] == 1) && (current == 0));
 
     /* Save for the next time. */
+    //prev[2] = prev[1];
+    //(prev[2] == 0) && 
     prev[1] = prev[0];
     prev[0] = current;
-
+    // intToStr(prev[0],eng_buff,1);
+    // puts1(eng_buff);
+    
+    // intToStr(prev[1],eng_buff,1);
+    // puts1(eng_buff);
+    
+    // intToStr(current,eng_buff,1);
+    // puts1(eng_buff);
+    // puts1("\r\n");
     return clap;
 }
