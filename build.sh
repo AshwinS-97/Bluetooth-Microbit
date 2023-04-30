@@ -44,9 +44,9 @@ mergehex -m $BLEDIR/hex/s113_nrf52_7.2.0_softdevice.hex app.hex -o MICROBIT.hex
 rm main.o app.out app.hex
 
 # Upload on the target
-cmd.exe /c copy MICROBIT.hex E:
+#cmd.exe /c copy MICROBIT.hex E:
 
 # The above command is applicable for a Windows PC. You may change it
 # appropriately to on Linux or MacOS. It should be something like:
-# cp MICROBIT.hex /media/MICROBIT       # linux
+cp MICROBIT.hex /media/navin/MICROBIT       # linux
 # cp MICROBIT.hex /Volumes/MICROBIT     # mac

@@ -6,6 +6,8 @@
 #include "lib.h"
 #include "buggy_controller.h"
 #include "utility.h"
+#include "bsp/lsm303agr.h"
+
 
 /* OS objects */
 osThreadId_t tid_ctrl;
@@ -51,18 +53,15 @@ void task_ctrl(void *arg)
     while (1)
     {
         /* Receive a command from BLE */
-        osThreadFlagsWait(1, osFlagsWaitAny, osWaitForever);
+        osThreadFlagsWait(1, osFlagsWaitAny, osWaitForever);        
 
         /* Echo on UART */
-        puts1((char *) cmd_buf);
-        puts1("\n");
+        puts1("cmd from BLE : ");
+        puts1((char *)cmd_buf);
 
-        ftoa(12.7777, (char *)cmd_buf, 4);
+
         add_controllerMsg((char *) cmd_buf);
-      
 
-        /* Echo on BLE */
-        ble_send((uint8_t *) cmd_buf, strlen((char *) cmd_buf));
     }
 }
 
@@ -75,7 +74,7 @@ void task_disp(void *arg)
         
         led_display(pic); 
         check_controllerMsg();   
-           
+       
     }
 }
 // Display Task
@@ -85,10 +84,12 @@ int main(void)
     /* BSP initializations before BLE because we are using printf from BSP */
     board_init();
     ble_init(ble_recv_handler);
-    
 
-    /* Greetings */
-    //printf("hello, world!\n");
+    pwm_init(PWM_CH1, PIN_3);
+    pwm_init(PWM_CH2, PIN_4);
+
+    IMUinit(0 , 0 , 2 , 0 , 0 , 0);
+    
     audio_sweep(500, 2000, 100);
 
     /* Initialize and start the kernel */
@@ -97,11 +98,11 @@ int main(void)
 
     /* controller task */
     tid_ctrl = osThreadNew(task_ctrl, NULL, NULL);
-    osThreadSetPriority(tid_ctrl, osPriorityLow1);
+    osThreadSetPriority(tid_ctrl, osPriorityLow2);
 
     /* Display Task */
     tid_disp = osThreadNew(task_disp, NULL, NULL);
-    osThreadSetPriority(tid_disp, osPriorityLow);
+    osThreadSetPriority(tid_disp, osPriorityLow1);
 
     osKernelStart();
     /* never returns */

@@ -1,4 +1,5 @@
 #include "utility.h"
+#include <string.h>
 
 void reverse(char* str, int len)
 {
@@ -57,4 +58,42 @@ void ftoa(float n, char* res, int afterpoint)
  
         intToStr((int)fpart, res + i + 1, afterpoint);
     }
+}
+
+void printMetrics(float refAngle,float currAngle, int error, float kp,int lcontrol,int rcontrol,char* msg){
+    
+    
+    char refAngleArr[7];
+    ftoa(refAngle,refAngleArr,3);
+
+    char currAngleArr[7];
+    ftoa(currAngle,currAngleArr,3);
+
+    char errorArr[5];
+    intToStr(error,errorArr,4);
+
+    char kpArr[5];
+    ftoa(kp,kpArr,3);
+
+    char lcontrolArr[5];
+    intToStr(lcontrol,lcontrolArr,2);
+
+    char rcontrolArr[5];
+    intToStr(rcontrol,rcontrolArr,2);
+
+    strcat(msg,"[ ");
+    strcat(msg,refAngleArr);
+    strcat(msg," , ");
+    strcat(msg,currAngleArr);
+    strcat(msg," , ");
+    strcat(msg,errorArr);
+    strcat(msg," , ");
+    strcat(msg,kpArr);
+    strcat(msg," , ");
+    strcat(msg,lcontrolArr);
+    strcat(msg," , ");
+    strcat(msg,rcontrolArr);
+    strcat(msg,"] \n");
+
+
 }
