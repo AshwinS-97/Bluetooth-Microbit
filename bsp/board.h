@@ -54,6 +54,18 @@ extern "C" {
 #define RUN_MIC     20  // P0_20
 #endif
 
+//pin numbers
+#define PIN_1 1
+#define PIN_2 2
+#define PIN_3 3
+#define PIN_4 4
+
+//PWM channels
+#define PWM_CH1 1
+#define PWM_CH2 2
+
+
+
 /* Function prototypes */
 
 /* board */

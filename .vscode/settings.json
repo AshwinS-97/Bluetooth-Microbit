@@ -1,0 +1,8 @@
+{
+    "files.associations": {
+        "stdint.h": "c",
+        "board.h": "c",
+        "pwm.h": "c",
+        "lsm303agr.h": "c"
+    }
+}

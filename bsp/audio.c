@@ -3,7 +3,7 @@
 #include <ctype.h>
 #include "audio.h"
 #include "gpio.h"
-#include "pwm.h"
+#include "pwm_audio.h"
 #include "adc.h"
 #include "lib.h"
 
@@ -15,7 +15,7 @@ void audio_init(uint32_t speaker_pin, uint32_t mic_pin, uint32_t run_mic_pin)
     /* Speaker is connected to a PWM pin. We can use it to play tones by
      * generating a square wave at a specific frequency.
      */
-    pwm_init(speaker_pin);
+    pwm_init_audio(speaker_pin);
 
     if (run_mic_pin != 0)    // should we turn on the mic?
     {
@@ -45,7 +45,7 @@ void audio_volume(uint32_t volume)
 void audio_beep(int freq, int duration_ms)
 {
     /* Generate pwm with the specified frequency */
-    pwm_out(freq, duty_cycle, duration_ms);
+    pwm_out_audio(freq, duty_cycle, duration_ms);
 }
 
 /* Play all the frequencies from start to end for a given duration. */

@@ -64,7 +64,7 @@ void led_display(uint8_t pic[LED_NUM_ROWS][LED_NUM_COLS])
             /* Keep the LED on for a while. For NxN display, 1 ms delay
              * amounts to approximately 1000/NxN frames per second.
              */
-            delay_ms(1);
+            delay_ms(100);
 
             gpio_clear(led_rows[r]);
         }
