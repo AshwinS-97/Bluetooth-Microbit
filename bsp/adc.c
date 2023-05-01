@@ -68,7 +68,7 @@ void adc_read(uint16_t buf[], uint32_t len)
     // while (ADC_EVENTS_END == 0)
     //     ;
     osThreadFlagsWait(1, osFlagsWaitAny, osWaitForever);
-    ADC_EVENTS_END = 0;     // clear the event
+    //ADC_EVENTS_END = 0;     // clear the event
 
 #if 0   // testing
     printf("%d number of samples\n", ADC_RESULT_AMT);

@@ -61,6 +61,7 @@ void timer_callback(void *arg)
         if(ADC_EVENTS_END == 1)
         {
             osThreadFlagsSet(clap_id, 1);
+            ADC_EVENTS_END = 0;
         }
         osDelay(1);
     }
@@ -94,7 +95,7 @@ void task_ctrl(void *arg)
         puts1((char *) cmd_buf);
         puts1("\n");
 
-        ftoa(12.7777, (char *)cmd_buf, 4);
+        //ftoa(12.7777, (char *)cmd_buf, 4);
         add_controllerMsg((char *) cmd_buf);
       
 
@@ -110,7 +111,7 @@ void task_disp(void *arg)
      while (1)
      {
         
-        led_display(pic); 
+        //led_display(pic); 
         check_controllerMsg();   
            
      }
@@ -119,6 +120,7 @@ void task_disp(void *arg)
 void clap_detection(void *arg)
 {
     while(1){
+        //osThreadFlagsWait(1, osFlagsWaitAny, osWaitForever);
         if(clap_detect()){
             puts1("clap Detected\r\n");
         }

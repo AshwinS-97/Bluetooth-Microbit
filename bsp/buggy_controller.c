@@ -86,20 +86,20 @@ void add_controllerMsg(char* command){
 void execute_driver(char* command){
   if(strcmp(command,"FORWARD")==0){
     //buggy_move_forward(100);
-    led_display(fwd);
+    //led_display(fwd);
     puts1("MOVING FORWARD");
   }else if(strcmp(command,"BACKWARD")==0){
     //buggy_move_reverse(100);
     puts1("MOVING BACKWARD");
-    led_display(rev);
+    //led_display(rev);
   }else if(strcmp(command,"LEFT")==0){
     //buggy_spin_left();
     puts1("MOVING LEFT");
-    led_display(left);
+    //led_display(left);
   }else if(strcmp(command,"RIGHT")==0){
     //buggy_spin_right();
     puts1("MOVING RIGHT");
-    led_display(right);
+    //led_display(right);
   }else if(strcmp(command,"STOP")==0){
     //buggy_stop();
     puts1("STOPPING");
