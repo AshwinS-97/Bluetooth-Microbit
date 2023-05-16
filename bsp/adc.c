@@ -2,6 +2,7 @@
 #include <string.h>
 #include "adc.h"
 #include "../rtx/cmsis_os2.h"
+#include "serial.h"
 /*
  * We will use an ADC to read inputs from the microphone.
  */
@@ -12,6 +13,11 @@
  */
 
 
+extern uint32_t samples_collected; 
+
+#define NVIC_ISER           IOREG32(0xE000E100)
+#define SAADC_ID           7               // peripheral ID
+
 
 void adc_init(uint32_t ain)
 {
@@ -19,6 +25,14 @@ void adc_init(uint32_t ain)
 
     /* Enable ADC */
     ADC_ENABLE = 1;
+
+    // Enable Interupt
+    ADC_INTEN = 2;
+
+    /* Enable GPIOTE interrupts in the interrupt controller */
+    NVIC_ISER |= (1 << SAADC_ID);
+
+    //ADC_INTENSET = (1 << 1);
 
     /*
      * Connect channel 0 to the specified analog input pin ain.
@@ -63,12 +77,12 @@ void adc_read(uint16_t buf[], uint32_t len)
     /* Start the ADC and start sampling the first input. */
     ADC_START = 1;
     ADC_SAMPLE = 1;
-
+    //puts1("EasyDMA for SAADC collection started\n\r");
     /* Wait until all the samples are written into memory. */
     // while (ADC_EVENTS_END == 0)
     //     ;
-    osThreadFlagsWait(1, osFlagsWaitAny, osWaitForever);
-    //ADC_EVENTS_END = 0;     // clear the event
+    // // osThreadFlagsWait(1, osFlagsWaitAny, osWaitForever);
+    // ADC_EVENTS_END = 0;     // clear the event
 
 #if 0   // testing
     printf("%d number of samples\n", ADC_RESULT_AMT);
@@ -77,4 +91,19 @@ void adc_read(uint16_t buf[], uint32_t len)
 #endif
 
     return;
+}
+
+extern osThreadId_t Audio_processing;
+void SAADC_IRQHandler(void)
+{
+   // Interupts should not include debug statements as it is leading to crashes
+   // it has to be simple and no IO operations should be performed as it may lead to 
+   // unexpected behaviour.
+    if (ADC_EVENTS_END == 1)
+    {
+        samples_collected = 1;
+        ADC_EVENTS_END = 0; 
+        osThreadFlagsSet(Audio_processing, 1); 
+    }
+   // puts1("Inside Irq");    
 }

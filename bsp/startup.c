@@ -16,6 +16,7 @@ void GPIOTE_IRQHandler(void);
 void RTC1_IRQHandler(void);
 void SWI2_EGU2_IRQHandler(void);
 static void IntDefaultHandler(void);
+void SAADC_IRQHandler(void);
 
 //*****************************************************************************
 // The following are constructs created by the linker, indicating where the
@@ -72,7 +73,7 @@ pfn_t vector_table[] =
     IntDefaultHandler,                      // SPIM1_SPIS1_TWIM1_TWIS1_SPI1_TWI1_IRQHandler
     IntDefaultHandler,                      // NFCT_IRQHandler
     GPIOTE_IRQHandler,                      // GPIOTE_IRQHandler
-    IntDefaultHandler,                      // SAADC_IRQHandler
+    SAADC_IRQHandler,                       // SAADC_IRQHandler
     IntDefaultHandler,                      // TIMER0_IRQHandler
     IntDefaultHandler,                      // TIMER1_IRQHandler
     IntDefaultHandler,                      // TIMER2_IRQHandler
@@ -220,4 +221,5 @@ void __attribute__((weak)) SysTick_Handler(void) { IntDefaultHandler(); }
 void __attribute__((weak)) GPIOTE_IRQHandler(void) { IntDefaultHandler(); }
 void __attribute__((weak)) SWI2_EGU2_IRQHandler(void) { IntDefaultHandler(); }
 void __attribute__((weak)) RTC1_IRQHandler(void) { IntDefaultHandler(); }
+void __attribute__((weak)) SAADC_IRQHandler(void) { IntDefaultHandler(); }
 static void IntDefaultHandler(void) { led_blink(4, 4, BLINK_FOREVER); }

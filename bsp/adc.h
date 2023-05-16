@@ -13,6 +13,8 @@
 #define ADC_EVENTS_END      IOREG32(0x40007104) // sampling has filled up the result buffer
 #define ADC_EVENTS_DONE     IOREG32(0x40007108) // conversion task completed
 #define ADC_EVENTS_RESDONE  IOREG32(0x4000710C) // result ready for transfer to RAM
+#define ADC_INTEN           IOREG32(0x40007300) // to enable/disable interupt 
+#define ADC_INTENSET        IOREG32(0x40007304) // to enable interupt
 #define ADC_STATUS          IOREG32(0x40007400) // indicates if busy or conversion done
 #define ADC_ENABLE          IOREG32(0x40007500) // enable/disable ADC
 #define ADC_PSELP(n)        IOREG32(0x40007510 + n * 0x10)

@@ -184,6 +184,18 @@ void music_play(char tunes[])
 
 static uint16_t samples[CLAP_FRAMELEN];     // to collect the samples
 
+uint32_t samples_collected = 0; 
+
+void get_audio_samples(void)
+{
+    if (samples_collected == 0)
+    {
+       // puts1("collecting Audio Samples Initiated\n\r");
+        adc_read(samples, CLAP_FRAMELEN);
+    }
+        
+}
+
 uint32_t clap_detect(void)
 {
     
@@ -201,7 +213,7 @@ uint32_t clap_detect(void)
     int i;
 
     /* Read a buffer of samples from the mic */
-    adc_read(samples, CLAP_FRAMELEN);
+    //adc_read(samples, CLAP_FRAMELEN);
     // for (int i =0; i<CLAP_FRAMELEN;i++)
     // {
     //     intToStr(samples[i],sample_buff,3);

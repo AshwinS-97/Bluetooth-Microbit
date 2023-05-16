@@ -15,5 +15,6 @@ void music_play(char tunes[]);
 
 /* Mic */
 uint32_t clap_detect(void);
+void get_audio_samples(void);
 
 #endif /* AUDIO_H */

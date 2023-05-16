@@ -10,21 +10,23 @@
 #include "adc.h"
 
 /* OS objects */
-osThreadId_t tid_ctrl;
-osThreadId_t tid_disp;
+//osThreadId_t tid_ctrl;
+// osThreadId_t tid_disp;
 osThreadId_t timer_id;
-osThreadId_t clap_id;
+osThreadId_t Audio_processing;
 
+
+extern uint32_t samples_collected; 
 
 
 /* Collision detection */
-float acc_val[3] = {0.0,0.0,0.0};
-float acc_val_filtered[3] = {0.0,0.0,0.0};
-float gamma1 = 0.025;
-char buff[256];
-int counter = 0;
-#define UPPER_THRESHOLD 150
-#define LOWER_THRESHOLD 20
+// float acc_val[3] = {0.0,0.0,0.0};
+// float acc_val_filtered[3] = {0.0,0.0,0.0};
+// float gamma1 = 0.025;
+// char buff[256];
+// int counter = 0;
+// #define UPPER_THRESHOLD 150
+// #define LOWER_THRESHOLD 20
 
 /* Buffer to hold the command received from UART or BLE
  * We use single buffer assuming command-response protocol,
@@ -34,36 +36,34 @@ int counter = 0;
 uint8_t cmd_buf[256];
 uint32_t cmd_len;
 
-uint8_t pic[5][5] ={        {0, 0, 0, 0, 0},
-                            {0, 0, 0, 0, 0},
-                            {0, 0, 0, 0, 0},
-                            {0, 0, 0, 0, 0},
-                            {0, 0, 0, 0, 0} 
-                    };	
+// uint8_t pic[5][5] ={        {0, 0, 0, 0, 0},
+//                             {0, 0, 0, 0, 0},
+//                             {0, 0, 0, 0, 0},
+//                             {0, 0, 0, 0, 0},
+//                             {0, 0, 0, 0, 0} 
+//                     };	
 
 
 void timer_callback(void *arg)
 {
     while(1){
-        counter ++;
-        if(counter > 40) counter = 1;
-        accReadXYZ(acc_val);
-        for(int i = 0; i<3 ;++i)
-        {
-            acc_val_filtered[i] = (1-gamma1)*acc_val_filtered[i] + gamma1*acc_val[i];             
-        }       
-        // ftoa(norm (acc_val_filtered, 3), buff, 2);
-        // if (counter == 1 ) puts1(buff);
-        // if (counter == 1 ) puts1(" Printin\r\n") ;
-        if (norm (acc_val_filtered, 3) > UPPER_THRESHOLD || norm (acc_val_filtered, 3) < LOWER_THRESHOLD)
-        puts1("Collision detected\r\n");
+        //puts1("In timer Thread\r\n");
+        // counter ++;
+        // if(counter > 40) counter = 1;
+        // accReadXYZ(acc_val);
+        // for(int i = 0; i<3 ;++i)
+        // {
+        //     acc_val_filtered[i] = (1-gamma1)*acc_val_filtered[i] + gamma1*acc_val[i];             
+        // }       
+        // // ftoa(norm (acc_val_filtered, 3), buff, 2);
+        // // if (counter == 1 ) puts1(buff);
+        // // if (counter == 1 ) puts1(" Printin\r\n") ;
+        // if (norm (acc_val_filtered, 3) > UPPER_THRESHOLD || norm (acc_val_filtered, 3) < LOWER_THRESHOLD)
+        // puts1("Collision detected\r\n");
         // Clap detection
-        if(ADC_EVENTS_END == 1)
-        {
-            osThreadFlagsSet(clap_id, 1);
-            ADC_EVENTS_END = 0;
-        }
-        osDelay(1);
+        //samples_collected = 0;
+        get_audio_samples();
+        osDelay(100);
     }
 }
 
@@ -81,52 +81,43 @@ static void ble_recv_handler(const uint8_t s[], uint32_t len)
     cmd_len = len;
 
     /* Signal the waiting task. */
-    osThreadFlagsSet(tid_ctrl, 1); 
+    //osThreadFlagsSet(tid_ctrl, 1); 
+     /* Echo on BLE */
+    ble_send((uint8_t *) cmd_buf, strlen((char *) cmd_buf));
 }
 
-void task_ctrl(void *arg)
-{
-    while (1)
-    {
-        /* Receive a command from BLE */
-        osThreadFlagsWait(1, osFlagsWaitAny, osWaitForever);
+// void task_ctrl(void *arg)
+// {
+//     while (1)
+//     {
+//         /* Receive a command from BLE */
+//         osThreadFlagsWait(1, osFlagsWaitAny, osWaitForever);
 
-        /* Echo on UART */
-        puts1((char *) cmd_buf);
-        puts1("\n");
+//         /* Echo on UART */
+//         puts1((char *) cmd_buf);
+//         puts1("\n");
 
-        //ftoa(12.7777, (char *)cmd_buf, 4);
-        add_controllerMsg((char *) cmd_buf);
+//         //ftoa(12.7777, (char *)cmd_buf, 4);
+//         add_controllerMsg((char *) cmd_buf);
       
 
-        /* Echo on BLE */
-        ble_send((uint8_t *) cmd_buf, strlen((char *) cmd_buf));
-    }
-}
+       
+//     }
+// }
 
-// Display Task
 
-void task_disp(void *arg)
-{
-     while (1)
-     {
-        
-        //led_display(pic); 
-        check_controllerMsg();   
-           
-     }
-}
-// clap 
-void clap_detection(void *arg)
+// Audio_proc_thread 
+void Audio_proc_thread(void *arg)
 {
     while(1){
-        //osThreadFlagsWait(1, osFlagsWaitAny, osWaitForever);
+        //puts1("In Audio_proc_thread\r");
+        osThreadFlagsWait(1, osFlagsWaitAny, osWaitForever);
         if(clap_detect()){
             puts1("clap Detected\r\n");
         }
-        else{
+        samples_collected = 0; 
+       // once audio is processed set the global flag
 
-        }
     }
 }
 
@@ -151,19 +142,19 @@ int main(void)
     osKernelInitialize();
     init_controller();
 
-    /* controller task */
-    tid_ctrl = osThreadNew(task_ctrl, NULL, NULL);
-    osThreadSetPriority(tid_ctrl, osPriorityLow2);
+    // /* controller task */
+    // tid_ctrl = osThreadNew(task_ctrl, NULL, NULL);
+    // osThreadSetPriority(tid_ctrl, osPriorityLow2);
 
-    /* Display Task */
-    tid_disp = osThreadNew(task_disp, NULL, NULL);
-    osThreadSetPriority(tid_disp, osPriorityLow);
+    // /* Display Task */
+    // tid_disp = osThreadNew(task_disp, NULL, NULL);
+    // osThreadSetPriority(tid_disp, osPriorityLow);
 
-    /* Display Task */
-    clap_id = osThreadNew(clap_detection, NULL, NULL);
-    osThreadSetPriority(clap_id, osPriorityLow1);
+    // /* Audio_processing*/
+    Audio_processing = osThreadNew(Audio_proc_thread, NULL, NULL);
+    osThreadSetPriority(Audio_proc_thread, osPriorityLow1);
 
-    /* Timer Thread */
+    // /* Timer Thread */
     timer_id = osThreadNew (timer_callback, NULL, NULL);
     osThreadSetPriority(timer_id, osPriorityNormal1);
 
